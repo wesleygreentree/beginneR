@@ -1,0 +1,86 @@
+# Data visualization with R
+
+They say a photo is worth 1000 words. The same is true when presenting data through graphs.
+
+There are two major ways to produce graphs in R: using `base::plot()` ("base R" plots) and `ggplot2::ggplot()`. In most cases, `ggplot()` is the best way to produce clean figures for presentations and publications. However, when using `ggplot()`, it is wise to go beyond the default themes and colour palettes. Here, I provide code for common figures: bar charts, stacked bar charts, pie charts, scatter plots, means with error bars. `ggplot()` combined with the DFO `PBSMapping` package is a great way to produce maps. This is beyond the present scope, but I'm happy to share code to produce maps with R.
+
+`ggplot()` is built on three primary arguments necessary for all plots: `data`, `aes()` (short for aesthetics), and `geom()`. Secondary arguments (not necessary) are `theme()`, `scale()`, and `facet()`. When reading others' code, note that some may not explicitly define the `data` and `aes()` arguments, as `ggplot()` is able to identify these without explicit `data` and `aes()` code.
+
+Here is a very simple bar chart produced in `ggplot()`, to illustrate these primary arguments.
+
+```{r setup, include = FALSE}
+library(ggplot2)
+taxa <- c("hake", "rockfish", "sawfish")
+coolness <- c(1, 6, 10)
+
+df <- dplyr::bind_cols(taxa, coolness)
+names(df) <- c("taxa", "coolness")
+```
+
+```{r basic bar chart, include = TRUE}
+ggplot(data = df, aes(x = taxa, y = coolness)) +
+  geom_col(aes(fill = taxa)) # bar chart
+```
+
+By including `theme()` and other secondary arguments (e.g., `scale`), we can drastically improve the clarity and visual appeal of this plot. `ggplot()` includes some pre-made themes that are very useful. For example, `theme_classic()` produces clean plots and a starting point to create beautiful graphics.
+
+```{r nice bar chart, include = TRUE}
+ggplot(data = df, aes(x = taxa, y = coolness)) +
+  geom_col(aes(fill = taxa)) +
+  xlab("Taxa") + # change x-axis title
+  ylab("Coolness Index") + # change y-axis title
+  scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10)) + # change y-axis interval
+  theme_classic() + # changes theme broadly, but still need to increase text size and make other changes
+  theme(axis.title = element_text(size = 16, color = "black"), # increase axis text size 
+        axis.text = element_text(size = 14, color = "black"),
+        axis.line = element_line(size = 1), # thicker, darker axis lines and tick marks
+        axis.ticks = element_line(size = 1)) +
+  theme(legend.position = "none") + # remove legend
+  scale_fill_manual(values = c("cyan4", "darkorange2", "deepskyblue4")) # default colours not colour-blind friendly
+
+```
+
+When producing figures, it is important to use colours that are easily distinguishable by colour-blind individuals. Therefore, red and green should be avoided in the same plot. In the plot above, the colour names used in `scale_fill_manual()` correspond to a hexadecimal colour code in R. `scale_fill_manual()` can take hexadecimal colour codes instead of R-specific colour names, which is a useful feature.
+
+### How to save a plot
+
+Once you have made your beautiful figure, how do you save the figure so that it can be included in your next publication or awesome talk?
+
+The easiest way to save a ggplot is with `ggplot2::ggsave()`. Here, we will save the basic bar chart we made earlier.
+
+```{r save plot, include = TRUE}
+ggplot(data = df, aes(x = taxa, y = coolness)) +
+  geom_col(aes(fill = taxa)) # bar chart
+
+ggsave("plot.PNG", width = 17, height = 15, units = "cm", dpi = 1600, bg = "transparent")
+
+```
+
+`ggsave()` follows the format: `ggsave(file, dimensions, units, resolution, background colour)`
+
+The file will be saved in the same folder as the .Rproj file. If you need to save a plot in a different folder than this, provide the full path. For example: `ggsave("C:/Users/UserName/Documents/DesiredFolder/file.PNG")` in Windows.
+
+Plots should be saved at very high resolution (e.g., 1600 dpi).
+
+It is often useful to fiddle with plot size in `ggsave()`. 17 cm wide corresponds well to Word documents, but smaller-sized plots often look nice too.
+
+### Other types of plots
+
+Now that you have learned how to make a basic plot with `ggplot()`, here is code to produce other common figures with `ggplot()`
+
+
+```{R stacked bar chart}
+# Stacked bar chart
+```
+
+```{R pie chart}
+# Pie chart
+```
+
+```{R scatterplot with trendline}
+# Scatterplot, with a linear regression fit
+```
+
+```{R mean and error bar}
+# Mean and error bar plot
+```
