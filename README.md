@@ -1,1 +1,1 @@
-# beginneR
+# beginneR: learn the basics of R!
